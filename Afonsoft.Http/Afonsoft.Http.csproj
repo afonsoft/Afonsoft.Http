@@ -15,6 +15,7 @@
     <PackageTags>http rest api post get</PackageTags>
     <Description>Ferramenta para utlizar o REST</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>2019.4.29</Version>
   </PropertyGroup>
   
   <ItemGroup Condition=" '$(TargetFramework)' != 'netstandard2.0' ">
