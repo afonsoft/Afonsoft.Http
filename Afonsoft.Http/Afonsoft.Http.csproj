@@ -7,15 +7,19 @@
     <Copyright>Afonsoft</Copyright>
     <PackageLicenseUrl>http://opensource.org/licenses/Apache-2.0</PackageLicenseUrl>
     <NeutralLanguage>pt-BR</NeutralLanguage>
-    <AssemblyVersion>2019.4.29</AssemblyVersion>
-    <FileVersion>2019.4.29</FileVersion>
+    <AssemblyVersion>2019.5.8</AssemblyVersion>
+    <FileVersion>2019.5.8</FileVersion>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/afonsoft/Afonsoft.Http</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/afonsoft/Afonsoft.Http</PackageProjectUrl>
+    <PackageProjectUrl>https://www.afonsoft.com.br</PackageProjectUrl>
     <PackageTags>http rest api post get</PackageTags>
     <Description>Ferramenta para utlizar o REST</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>2019.4.29</Version>
+    <Version>2019.5.8</Version>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|AnyCPU'">
+    <DocumentationFile>C:\Users\anogueira\Source\Repos\Afonsoft.Http\Afonsoft.Http\Afonsoft.Http.xml</DocumentationFile>
   </PropertyGroup>
   
   <ItemGroup Condition=" '$(TargetFramework)' != 'netstandard2.0' ">

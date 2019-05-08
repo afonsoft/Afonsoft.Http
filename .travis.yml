@@ -1,0 +1,18 @@
+language: csharp
+sudo: required  
+dist: xenial  
+mono: latest
+dotnet: 2.2.203
+env:
+  global:
+    - ResolveNuGetPackageAssets=true
+    - EnableNuGetPackageRestore=true
+os:
+  - linux
+  - osx
+  - windows
+solution: Afonsoft.Http.sln
+install:
+  - dotnet restore
+script:
+  - dotnet build

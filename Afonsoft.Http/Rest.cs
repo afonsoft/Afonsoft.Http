@@ -245,7 +245,7 @@ namespace Afonsoft.Http
 
 
         /// <summary>
-        /// HttpGetOrPost
+        /// HttpGetOrPostAsync
         /// </summary>
         /// <param name="uri">/API/VALUE</param>
         /// <param name="method">GET, HEAD, POST, PUT, DELETE, TRACE, or OPTIONS.</param>
