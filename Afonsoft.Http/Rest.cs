@@ -5,9 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
-#if !NET35
 using System.Threading.Tasks;
-#endif
 using System.Web;
 
 namespace Afonsoft.Http
@@ -188,7 +186,8 @@ namespace Afonsoft.Http
         /// <summary>
         /// CookieContainer
         /// </summary>
-        public CookieContainer Cookie {
+        public CookieContainer Cookie
+        {
             get => _cookieContainer;
             set => _cookieContainer = value;
         }
@@ -205,6 +204,7 @@ namespace Afonsoft.Http
 
 
         private readonly List<HttpHeader> _headers = new List<HttpHeader>();
+        private List<HttpParameter> Parameters = new List<HttpParameter>();
 
         /// <summary>
         /// Add Headers for all future Request
@@ -229,8 +229,6 @@ namespace Afonsoft.Http
         {
             return _headers.FirstOrDefault(x => x.Name == name);
         }
-
-        private List<HttpParameter> Parameters = new List<HttpParameter>();
 
         /// <summary>
         /// Add paramenter for a request, after request this list is clean
@@ -342,21 +340,21 @@ namespace Afonsoft.Http
             }
             catch (WebException wex)
             {
-                result = $"A WebException '{wex.Message}' status '{wex.Status}'";
+
                 var response = (HttpWebResponse)wex.Response;
                 if (response != null)
                 {
-                    if (response.ContentLength > 0)
+                    try
                     {
-                        using (var reader = new StreamReader(response.GetResponseStream(), true))
+                        using (var streamReader = new StreamReader(response.GetResponseStream(), Encode, true))
                         {
-                            string responseBody = reader.ReadToEnd().Replace(Environment.NewLine, "").Replace("\n", "").Replace("\r", "");
-                            result += responseBody;
+                            result = streamReader.ReadToEnd().Trim().Replace(Environment.NewLine, "").Replace("\n", "").Replace("\r", "");
                         }
                     }
-                    else
+                    catch (Exception)
                     {
-                        result +=$", response: {(int) response.StatusCode} {response.StatusDescription}: {wex.Message}";
+                        result = $"A WebException '{wex.Message}' status '{wex.Status}'";
+                        result += $", response: {(int)response.StatusCode} {response.StatusDescription}: {wex.Message}";
                     }
                 }
                 throw new Exception(result, wex);
@@ -368,26 +366,19 @@ namespace Afonsoft.Http
             return result;
         }
 
-#endregion
+        #endregion
 
-#region HttpPost and HttpGet
+        #region HttpPost and HttpGet
 
-#region POST
+        #region POST
 
         /// <summary>
         /// HttpPost
         /// </summary>
-        public dynamic HttpPost(string uri)
+        public string HttpPost(string uri)
         {
-            string json = HttpGetOrPost(uri, HttpMethod.POST);
-            try
-            {
-                return JsonConvert.DeserializeObject(json);
-            }
-            catch
-            {
-                return json;
-            }
+            return HttpGetOrPost(uri, HttpMethod.POST);
+
         }
         /// <summary>
         /// HttpPost
@@ -399,17 +390,10 @@ namespace Afonsoft.Http
         /// <summary>
         /// HttpPost
         /// </summary>
-        public dynamic HttpPost(string uri, string postData)
+        public string HttpPost(string uri, string postData)
         {
-            string json = HttpGetOrPost(uri, HttpMethod.POST, null, postData);
-            try
-            {
-                return JsonConvert.DeserializeObject(json);
-            }
-            catch
-            {
-                return json;
-            }
+            return HttpGetOrPost(uri, HttpMethod.POST, null, postData);
+
         }
         /// <summary>
         /// HttpPost
@@ -421,17 +405,10 @@ namespace Afonsoft.Http
         /// <summary>
         /// HttpPost
         /// </summary>
-        public dynamic HttpPost(string uri, List<HttpHeader> headers, string postData)
+        public string HttpPost(string uri, List<HttpHeader> headers, string postData)
         {
-            string json = HttpGetOrPost(uri, HttpMethod.POST, headers, postData);
-            try
-            {
-                return JsonConvert.DeserializeObject(json);
-            }
-            catch
-            {
-                return json;
-            }
+            return HttpGetOrPost(uri, HttpMethod.POST, headers, postData);
+
         }
         /// <summary>
         /// HttpPost
@@ -443,17 +420,9 @@ namespace Afonsoft.Http
         /// <summary>
         /// HttpPost
         /// </summary>
-        public dynamic HttpPost(string uri, List<HttpHeader> headers)
+        public string HttpPost(string uri, List<HttpHeader> headers)
         {
-            string json = HttpGetOrPost(uri, HttpMethod.POST, headers);
-            try
-            {
-                return JsonConvert.DeserializeObject(json);
-            }
-            catch
-            {
-                return json;
-            }
+            return HttpGetOrPost(uri, HttpMethod.POST, headers);
         }
         /// <summary>
         /// HttpPost
@@ -466,17 +435,10 @@ namespace Afonsoft.Http
         /// <summary>
         /// HttpPostAsync
         /// </summary>
-        public async Task<dynamic> HttpPostAsync(string uri)
+        public Task<string> HttpPostAsync(string uri)
         {
-            string json = await HttpGetOrPostAsync(uri, HttpMethod.POST);
-            try
-            {
-                return JsonConvert.DeserializeObject(json);
-            }
-            catch
-            {
-                return json;
-            }
+            return HttpGetOrPostAsync(uri, HttpMethod.POST);
+
         }
         /// <summary>
         /// HttpPostAsync
@@ -488,17 +450,10 @@ namespace Afonsoft.Http
         /// <summary>
         /// HttpPostAsync
         /// </summary>
-        public async Task<dynamic> HttpPostAsync(string uri, string postData)
+        public async Task<string> HttpPostAsync(string uri, string postData)
         {
-            string json = await HttpGetOrPostAsync(uri, HttpMethod.POST, null, postData);
-            try
-            {
-                return JsonConvert.DeserializeObject(json);
-            }
-            catch
-            {
-                return json;
-            }
+            return await HttpGetOrPostAsync(uri, HttpMethod.POST, null, postData);
+
         }
         /// <summary>
         /// HttpPostAsync
@@ -510,18 +465,13 @@ namespace Afonsoft.Http
         /// <summary>
         /// HttpPostAsync
         /// </summary>
-        public async Task<dynamic> HttpPostAsync(string uri, List<HttpHeader> headers, string postData)
+
+        public Task<string> HttpPostAsync(string uri, List<HttpHeader> headers, string postData)
         {
-            string json = await HttpGetOrPostAsync(uri, HttpMethod.POST, headers, postData);
-            try
-            {
-                return JsonConvert.DeserializeObject(json);
-            }
-            catch
-            {
-                return json;
-            }
+            return HttpGetOrPostAsync(uri, HttpMethod.POST, headers, postData);
+
         }
+
         /// <summary>
         /// HttpPostAsync
         /// </summary>
@@ -532,17 +482,10 @@ namespace Afonsoft.Http
         /// <summary>
         /// HttpPostAsync
         /// </summary>
-        public async Task<dynamic> HttpPostAsync(string uri, List<HttpHeader> headers)
+        public Task<string> HttpPostAsync(string uri, List<HttpHeader> headers)
         {
-            string json = await HttpGetOrPostAsync(uri, HttpMethod.POST, headers);
-            try
-            {
-                return JsonConvert.DeserializeObject(json);
-            }
-            catch
-            {
-                return json;
-            }
+            return HttpGetOrPostAsync(uri, HttpMethod.POST, headers);
+
         }
         /// <summary>
         /// HttpPostAsync
@@ -553,41 +496,25 @@ namespace Afonsoft.Http
         }
 
 
-#endregion
+        #endregion
 
-#region GET
+        #region GET
 
         /// <summary>
         /// HttpGet
         /// </summary>
-        public dynamic HttpGet(string uri)
+        public string HttpGet(string uri)
         {
-            string json = HttpGetOrPost(uri, HttpMethod.GET);
-            try
-            {
-                return JsonConvert.DeserializeObject(json);
-            }
-            catch
-            {
-                return json;
-            }
+            return HttpGetOrPost(uri, HttpMethod.GET);
         }
 
 
         /// <summary>
         /// HttpGetAsync
         /// </summary>
-        public async Task<dynamic> HttpGetAsync(string uri)
+        public Task<string> HttpGetAsync(string uri)
         {
-            string json = await HttpGetOrPostAsync(uri, HttpMethod.GET);
-            try
-            {
-                return JsonConvert.DeserializeObject(json);
-            }
-            catch
-            {
-                return json;
-            }
+            return HttpGetOrPostAsync(uri, HttpMethod.GET);
         }
 
         /// <summary>
@@ -626,38 +553,21 @@ namespace Afonsoft.Http
         /// <summary>
         /// HttpGetAsync
         /// </summary>
-        public async Task<dynamic> HttpGetAsync(string uri, List<HttpHeader> headers)
+        public Task<string> HttpGetAsync(string uri, List<HttpHeader> headers)
         {
-            string json = await HttpGetOrPostAsync(uri, HttpMethod.GET, headers);
-            try
-            {
-                return JsonConvert.DeserializeObject(json);
-            }
-            catch
-            {
-                return json;
-            }
+            return HttpGetOrPostAsync(uri, HttpMethod.GET, headers);
         }
 
         /// <summary>
         /// HttpGet
         /// </summary>
-        public dynamic HttpGet(string uri, List<HttpHeader> headers)
+        public string HttpGet(string uri, List<HttpHeader> headers)
         {
-            string json = HttpGetOrPost(uri, HttpMethod.GET, headers);
-            try
-            {
-                return JsonConvert.DeserializeObject(json);
-            }
-            catch
-            {
-                return json;
-            }
+            return HttpGetOrPost(uri, HttpMethod.GET, headers);
         }
 
-#endregion
+        #endregion
 
-#endregion
+        #endregion
     }
 }
-

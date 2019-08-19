@@ -1,21 +1,23 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;netcoreapp2.2;net47</TargetFrameworks>
     <Authors>Afonso Dutra Nogueira Filho</Authors>
     <Company>Afonsoft</Company>
     <Copyright>Afonsoft</Copyright>
-    <PackageLicenseUrl>http://opensource.org/licenses/Apache-2.0</PackageLicenseUrl>
+    <PackageLicenseUrl></PackageLicenseUrl>
     <NeutralLanguage>pt-BR</NeutralLanguage>
-    <AssemblyVersion>2019.5.8</AssemblyVersion>
-    <FileVersion>2019.5.8</FileVersion>
+    <AssemblyVersion>2019.8.18</AssemblyVersion>
+    <FileVersion>2019.8.18</FileVersion>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/afonsoft/Afonsoft.Http</RepositoryUrl>
     <PackageProjectUrl>https://www.afonsoft.com.br</PackageProjectUrl>
     <PackageTags>http rest api post get put delete afonsoft</PackageTags>
-    <Description>Ferramenta para utlizar o REST</Description>
+    <Description>Ferramenta para utlizar o REST, http rest api post get put delete afonsoft</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>2019.5.8</Version>
+    <Version>2019.8.18</Version>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageReleaseNotes>Ferramenta para utlizar o REST, http rest api post get put delete afonsoft</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|AnyCPU'">
@@ -24,7 +26,7 @@
   
   <ItemGroup Condition=" '$(TargetFramework)' != 'netstandard2.0' ">
     <Reference Include="System.Web" />
-	<Reference Include="System.Net.Http" />
+	  <Reference Include="System.Net.Http" />
   </ItemGroup>
   
   <ItemGroup>
