@@ -98,7 +98,7 @@ namespace Afonsoft.Http
         /// </c>
         public Rest()
         {
-            EndPoint = "https://api.afonsoft.com.br";
+            EndPoint = "";
             Account = "";
             Password = "";
         }
@@ -127,33 +127,6 @@ namespace Afonsoft.Http
         public Rest(string endPoint, string account, string password)
         {
             EndPoint = endPoint;
-            Account = account;
-            Password = password;
-        }
-
-        /// <summary>
-        /// Classe Http para trabalhar com REST
-        /// </summary>
-        /// <param name="account">Account for Basic Authorization</param>
-        /// <param name="password">Password for Basic Authorization</param>
-        /// <c>
-        /// Avianca.Library.Http.Rest request = new Avianca.Library.Http.Rest("https://api.afonsoft.com.br");
-        ///            request.AddParameter("username", "anogueira");
-        ///            request.AddParameter("password", "*****");
-        ///            var tokenRequest = request.HttpPost("/API/Users/Login");
-        ///            if (tokenRequest != null)
-        ///            {
-        ///                string token = tokenRequest.Token;
-        ///                request.AddHeader("Token", tokenRequest.Authorization.Token.Value);
-        ///                var userInfo = request.HttpGet("/API/Users/Info");
-        ///                if (userInfo != null)
-        ///                {
-        ///                }
-        ///            }
-        /// </c>
-        public Rest(string account, string password)
-        {
-            EndPoint = "https://api.afonsoft.com.br";
             Account = account;
             Password = password;
         }
@@ -203,8 +176,7 @@ namespace Afonsoft.Http
         public string Password { get; set; }
 
 
-        private readonly List<HttpHeader> _headers = new List<HttpHeader>();
-        private List<HttpParameter> Parameters = new List<HttpParameter>();
+        private readonly HttpHeaderCollection _headers = new HttpHeaderCollection();
 
         /// <summary>
         /// Add Headers for all future Request
@@ -230,29 +202,19 @@ namespace Afonsoft.Http
             return _headers.FirstOrDefault(x => x.Name == name);
         }
 
-        /// <summary>
-        /// Add paramenter for a request, after request this list is clean
-        /// </summary>
-        public void AddParameter(string name, string value)
-        {
-            Parameters.Add(new HttpParameter(name, value));
-        }
 
         #region HttpGetOrPost and HttpGetOrPostAsync
-
-
 
         /// <summary>
         /// HttpGetOrPostAsync
         /// </summary>
         /// <param name="uri">/API/VALUE</param>
         /// <param name="method">GET, HEAD, POST, PUT, DELETE, TRACE, or OPTIONS.</param>
-        /// <param name="headers">headers</param>
         /// <param name="postData">Data to send</param>
         /// <returns>String Json</returns>
-        public Task<string> HttpGetOrPostAsync(string uri, HttpMethod method, List<HttpHeader> headers = null, string postData = null)
+        public Task<string> HttpGetOrPostAsync(string uri, HttpMethod method, Parameters parameters, byte[] postData = null)
         {
-            return Task.Run(() => HttpGetOrPost(uri, method, headers, postData));
+            return Task.Run(() => HttpGetOrPost(uri, method, parameters, postData));
         }
 
         /// <summary>
@@ -263,20 +225,17 @@ namespace Afonsoft.Http
         /// <param name="headers">headers</param>
         /// <param name="postData">Data to send</param>
         /// <returns>String Json</returns>
-        public string HttpGetOrPost(string uri, HttpMethod method, List<HttpHeader> headers = null, string postData = null)
+        public string HttpGetOrPost(string uri, HttpMethod method, Parameters parameters, byte[] postData = null)
         {
             var result = "";
             try
             {
-                if (headers == null)
-                    headers = _headers;
+                if (string.IsNullOrEmpty(uri))
+                    throw new ArgumentNullException(nameof(uri), "EndPoint is null");
 
-                if (Parameters != null && Parameters.Count > 0)
+                if (parameters != null && parameters.Count > 0)
                 {
-                    foreach (HttpParameter paramenter in Parameters)
-                    {
-                        uri += (uri.IndexOf('?') > 0 ? "&" : "?") + paramenter.Name + "=" + HttpUtility.UrlEncode(paramenter.Value);
-                    }
+                    uri += (uri.IndexOf('?') > 0 ? "&" : "?") + parameters.ToString();
                 }
 
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(new Uri(EndPoint + uri));
@@ -288,9 +247,9 @@ namespace Afonsoft.Http
                     request.Headers.Add("Authorization", "Basic " + encoded);
                 }
 
-                if (headers != null && headers.Count > 0)
+                if (_headers != null && _headers.Count > 0)
                 {
-                    foreach (var header in headers)
+                    foreach (var header in _headers)
                     {
                         if (request.Headers.AllKeys.Count(x => x == header.Name) <= 0)
                         {
@@ -311,13 +270,12 @@ namespace Afonsoft.Http
                 if (method == HttpMethod.POST || method == HttpMethod.PUT || method == HttpMethod.DELETE)
                 {
                     request.ContentType = "application/json";
-                    if (!string.IsNullOrEmpty(postData))
+                    if (postData != null && postData.Length > 0)
                     {
-                        byte[] postDataBytes = Encode.GetBytes(postData);
-                        request.ContentLength = postDataBytes.Length;
+                        request.ContentLength = postData.Length;
                         using (var dataStream = request.GetRequestStream())
                         {
-                            dataStream.Write(postDataBytes, 0, postDataBytes.Length);
+                            dataStream.Write(postData, 0, postData.Length);
                         }
                     }
                 }
@@ -328,11 +286,10 @@ namespace Afonsoft.Http
                     {
                         string Charset = httpWebResponse.CharacterSet;
                         Encode = Encoding.GetEncoding(Charset);
-
                         _cookieContainer.Add(httpWebResponse.Cookies);
                         using (var streamReader = new StreamReader(httpWebResponse.GetResponseStream(), Encode, true))
                         {
-                            result = streamReader.ReadToEnd().Trim().Replace(Environment.NewLine, "").Replace("\n", "").Replace("\r", "");
+                            result = streamReader.ReadToEnd().Trim().Replace(Environment.NewLine, "").Replace("\n", "").Replace("\r", "").Trim();
                         }
                     }
                 }
@@ -340,7 +297,6 @@ namespace Afonsoft.Http
             }
             catch (WebException wex)
             {
-
                 var response = (HttpWebResponse)wex.Response;
                 if (response != null)
                 {
@@ -348,7 +304,13 @@ namespace Afonsoft.Http
                     {
                         using (var streamReader = new StreamReader(response.GetResponseStream(), Encode, true))
                         {
-                            result = streamReader.ReadToEnd().Trim().Replace(Environment.NewLine, "").Replace("\n", "").Replace("\r", "");
+                            result = streamReader.ReadToEnd().Trim().Replace(Environment.NewLine, "").Replace("\n", "").Replace("\r", "").Trim();
+                        }
+
+                        if (string.IsNullOrEmpty(result))
+                        {
+                            result = $"A WebException '{wex.Message}' status '{wex.Status}'";
+                            result += $", response: {(int)response.StatusCode} {response.StatusDescription}: {wex.Message}";
                         }
                     }
                     catch (Exception)
@@ -358,10 +320,6 @@ namespace Afonsoft.Http
                     }
                 }
                 throw new Exception(result, wex);
-            }
-            finally
-            {
-                Parameters = new List<HttpParameter>();
             }
             return result;
         }
@@ -377,7 +335,16 @@ namespace Afonsoft.Http
         /// </summary>
         public string HttpPost(string uri)
         {
-            return HttpGetOrPost(uri, HttpMethod.POST);
+            return HttpGetOrPost(uri, HttpMethod.POST, null);
+
+        }
+
+        /// <summary>
+        /// HttpPost
+        /// </summary>
+        public string HttpPost(string uri, Parameters parameters)
+        {
+            return HttpGetOrPost(uri, HttpMethod.POST, parameters);
 
         }
         /// <summary>
@@ -385,51 +352,47 @@ namespace Afonsoft.Http
         /// </summary>
         public T HttpPost<T>(string uri)
         {
-            return Deserialize<T>(HttpGetOrPost(uri, HttpMethod.POST));
+            return Deserialize<T>(HttpGetOrPost(uri, HttpMethod.POST, null));
         }
+
+        /// <summary>
+        /// HttpPost
+        /// </summary>
+        public T HttpPost<T>(string uri, Parameters parameters)
+        {
+            return Deserialize<T>(HttpGetOrPost(uri, HttpMethod.POST, parameters));
+        }
+
+        /// <summary>
+        /// HttpPost
+        /// </summary>
+        public string HttpPost(string uri, byte[] postData)
+        {
+            return HttpGetOrPost(uri, HttpMethod.POST, null, postData);
+
+        }
+
         /// <summary>
         /// HttpPost
         /// </summary>
         public string HttpPost(string uri, string postData)
         {
-            return HttpGetOrPost(uri, HttpMethod.POST, null, postData);
+            return HttpGetOrPost(uri, HttpMethod.POST, null,  Encode.GetBytes(postData));
 
         }
         /// <summary>
         /// HttpPost
         /// </summary>
-        public T HttpPost<T>(string uri, string postData)
+        public T HttpPost<T>(string uri, byte[] postData)
         {
             return Deserialize<T>(HttpGetOrPost(uri, HttpMethod.POST, null, postData));
         }
         /// <summary>
         /// HttpPost
         /// </summary>
-        public string HttpPost(string uri, List<HttpHeader> headers, string postData)
+        public T HttpPost<T>(string uri, string postData)
         {
-            return HttpGetOrPost(uri, HttpMethod.POST, headers, postData);
-
-        }
-        /// <summary>
-        /// HttpPost
-        /// </summary>
-        public T HttpPost<T>(string uri, List<HttpHeader> headers, string postData)
-        {
-            return Deserialize<T>(HttpGetOrPost(uri, HttpMethod.POST, headers, postData));
-        }
-        /// <summary>
-        /// HttpPost
-        /// </summary>
-        public string HttpPost(string uri, List<HttpHeader> headers)
-        {
-            return HttpGetOrPost(uri, HttpMethod.POST, headers);
-        }
-        /// <summary>
-        /// HttpPost
-        /// </summary>
-        public T HttpPost<T>(string uri, List<HttpHeader> headers)
-        {
-            return Deserialize<T>(HttpGetOrPost(uri, HttpMethod.POST, headers));
+            return Deserialize<T>(HttpGetOrPost(uri, HttpMethod.POST, null, Encode.GetBytes(postData)));
         }
 
         /// <summary>
@@ -437,7 +400,15 @@ namespace Afonsoft.Http
         /// </summary>
         public Task<string> HttpPostAsync(string uri)
         {
-            return HttpGetOrPostAsync(uri, HttpMethod.POST);
+            return HttpGetOrPostAsync(uri, HttpMethod.POST, null);
+
+        }
+        /// <summary>
+        /// HttpPostAsync
+        /// </summary>
+        public Task<string> HttpPostAsync(string uri, Parameters parameters)
+        {
+            return HttpGetOrPostAsync(uri, HttpMethod.POST, parameters);
 
         }
         /// <summary>
@@ -445,14 +416,37 @@ namespace Afonsoft.Http
         /// </summary>
         public async Task<T> HttpPostAsync<T>(string uri)
         {
-            return Deserialize<T>(await HttpGetOrPostAsync(uri, HttpMethod.POST));
+            return Deserialize<T>(await HttpGetOrPostAsync(uri, HttpMethod.POST, null));
         }
         /// <summary>
         /// HttpPostAsync
         /// </summary>
-        public async Task<string> HttpPostAsync(string uri, string postData)
+        public async Task<T> HttpPostAsync<T>(string uri, Parameters parameters)
         {
-            return await HttpGetOrPostAsync(uri, HttpMethod.POST, null, postData);
+            return Deserialize<T>(await HttpGetOrPostAsync(uri, HttpMethod.POST, parameters));
+        }
+        /// <summary>
+        /// HttpPostAsync
+        /// </summary>
+        public Task<string> HttpPostAsync(string uri, byte[] postData)
+        {
+            return HttpGetOrPostAsync(uri, HttpMethod.POST, null, postData);
+
+        }
+        /// <summary>
+        /// HttpPostAsync
+        /// </summary>
+        public async Task<T> HttpPostAsync<T>(string uri, byte[] postData)
+        {
+            return Deserialize<T>(await HttpGetOrPostAsync(uri, HttpMethod.POST, null, postData));
+        }
+
+        /// <summary>
+        /// HttpPostAsync
+        /// </summary>
+        public Task<string> HttpPostAsync(string uri, string postData)
+        {
+            return HttpGetOrPostAsync(uri, HttpMethod.POST, null, Encode.GetBytes(postData));
 
         }
         /// <summary>
@@ -460,41 +454,8 @@ namespace Afonsoft.Http
         /// </summary>
         public async Task<T> HttpPostAsync<T>(string uri, string postData)
         {
-            return Deserialize<T>(await HttpGetOrPostAsync(uri, HttpMethod.POST, null, postData));
+            return Deserialize<T>(await HttpGetOrPostAsync(uri, HttpMethod.POST, null, Encode.GetBytes(postData)));
         }
-        /// <summary>
-        /// HttpPostAsync
-        /// </summary>
-
-        public Task<string> HttpPostAsync(string uri, List<HttpHeader> headers, string postData)
-        {
-            return HttpGetOrPostAsync(uri, HttpMethod.POST, headers, postData);
-
-        }
-
-        /// <summary>
-        /// HttpPostAsync
-        /// </summary>
-        public async Task<T> HttpPostAsync<T>(string uri, List<HttpHeader> headers, string postData)
-        {
-            return Deserialize<T>(await HttpGetOrPostAsync(uri, HttpMethod.POST, headers, postData));
-        }
-        /// <summary>
-        /// HttpPostAsync
-        /// </summary>
-        public Task<string> HttpPostAsync(string uri, List<HttpHeader> headers)
-        {
-            return HttpGetOrPostAsync(uri, HttpMethod.POST, headers);
-
-        }
-        /// <summary>
-        /// HttpPostAsync
-        /// </summary>
-        public async Task<T> HttpPostAsync<T>(string uri, List<HttpHeader> headers)
-        {
-            return Deserialize<T>(await HttpGetOrPostAsync(uri, HttpMethod.POST, headers));
-        }
-
 
         #endregion
 
@@ -505,7 +466,16 @@ namespace Afonsoft.Http
         /// </summary>
         public string HttpGet(string uri)
         {
-            return HttpGetOrPost(uri, HttpMethod.GET);
+            return HttpGetOrPost(uri, HttpMethod.GET, null);
+        }
+
+        /// <summary>
+        /// HttpGet
+        /// </summary>
+        /// <returns></returns>
+        public string HttpGet(string uri, Parameters parameters)
+        {
+            return HttpGetOrPost(uri, HttpMethod.GET, parameters);
         }
 
 
@@ -514,7 +484,15 @@ namespace Afonsoft.Http
         /// </summary>
         public Task<string> HttpGetAsync(string uri)
         {
-            return HttpGetOrPostAsync(uri, HttpMethod.GET);
+            return HttpGetOrPostAsync(uri, HttpMethod.GET, null);
+        }
+
+        /// <summary>
+        /// HttpGetAsync
+        /// </summary>
+        public Task<string> HttpGetAsync(string uri, Parameters parameters)
+        {
+            return HttpGetOrPostAsync(uri, HttpMethod.GET, parameters);
         }
 
         /// <summary>
@@ -522,7 +500,15 @@ namespace Afonsoft.Http
         /// </summary>
         public async Task<T> HttpGetAsync<T>(string uri)
         {
-            return Deserialize<T>(await HttpGetOrPostAsync(uri, HttpMethod.GET));
+            return Deserialize<T>(await HttpGetOrPostAsync(uri, HttpMethod.GET, null));
+        }
+
+        /// <summary>
+        /// HttpGetAsync
+        /// </summary>
+        public async Task<T> HttpGetAsync<T>(string uri, Parameters parameters)
+        {
+            return Deserialize<T>(await HttpGetOrPostAsync(uri, HttpMethod.GET, parameters));
         }
 
         /// <summary>
@@ -530,41 +516,17 @@ namespace Afonsoft.Http
         /// </summary>
         public T HttpGet<T>(string uri)
         {
-            return Deserialize<T>(HttpGetOrPost(uri, HttpMethod.GET));
+            return Deserialize<T>(HttpGetOrPost(uri, HttpMethod.GET, null));
         }
 
         /// <summary>
         /// HttpGet
         /// </summary>
-        public T HttpGet<T>(string uri, List<HttpHeader> headers)
+        public T HttpGet<T>(string uri, Parameters parameters)
         {
-            return Deserialize<T>(HttpGetOrPost(uri, HttpMethod.GET, headers));
+            return Deserialize<T>(HttpGetOrPost(uri, HttpMethod.GET, parameters));
         }
 
-        /// <summary>
-        /// HttpGetAsync
-        /// </summary>
-        public async Task<T> HttpGetAsync<T>(string uri, List<HttpHeader> headers)
-        {
-            return Deserialize<T>(await HttpGetOrPostAsync(uri, HttpMethod.GET, headers));
-        }
-
-
-        /// <summary>
-        /// HttpGetAsync
-        /// </summary>
-        public Task<string> HttpGetAsync(string uri, List<HttpHeader> headers)
-        {
-            return HttpGetOrPostAsync(uri, HttpMethod.GET, headers);
-        }
-
-        /// <summary>
-        /// HttpGet
-        /// </summary>
-        public string HttpGet(string uri, List<HttpHeader> headers)
-        {
-            return HttpGetOrPost(uri, HttpMethod.GET, headers);
-        }
 
         #endregion
 
