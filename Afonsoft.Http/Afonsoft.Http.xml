@@ -31,31 +31,106 @@
             Value
             </summary>
         </member>
-        <member name="T:Afonsoft.Http.HttpParameter">
+        <member name="P:Afonsoft.Http.HttpHeaderCollection.Item(System.Int32)">
+            <summary>
+            
+            </summary>
+            <param name="index"></param>
+            <returns></returns>
+        </member>
+        <member name="P:Afonsoft.Http.HttpHeaderCollection.Item(System.String)">
+            <summary>
+            
+            </summary>
+            <param name="parameter"></param>
+            <returns></returns>
+        </member>
+        <member name="P:Afonsoft.Http.HttpHeaderCollection.Count">
+            <summary>
+            Count 
+            </summary>
+        </member>
+        <member name="P:Afonsoft.Http.HttpHeaderCollection.IsReadOnly">
+            <summary>
+            IsReadOnly 
+            </summary>
+        </member>
+        <member name="M:Afonsoft.Http.HttpHeaderCollection.Add(Afonsoft.Http.HttpHeader)">
+            <summary>
+            Add
+            </summary>
+            <param name="item">IActiveDirectory</param>
+        </member>
+        <member name="M:Afonsoft.Http.HttpHeaderCollection.Clear">
+            <summary>
+            Clear
+            </summary>
+        </member>
+        <member name="M:Afonsoft.Http.HttpHeaderCollection.Contains(Afonsoft.Http.HttpHeader)">
+            <summary>
+            Contains
+            </summary>
+            <param name="item">IActiveDirectory</param>
+            <returns></returns>
+        </member>
+        <member name="M:Afonsoft.Http.HttpHeaderCollection.CopyTo(Afonsoft.Http.HttpHeader[],System.Int32)">
+            <summary>
+            CopyTo
+            </summary>
+            <param name="array">IActiveDirectory</param>
+            <param name="arrayIndex">int</param>
+        </member>
+        <member name="M:Afonsoft.Http.HttpHeaderCollection.GetEnumerator">
+            <summary>
+            GetEnumerator
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Afonsoft.Http.HttpHeaderCollection.Remove(Afonsoft.Http.HttpHeader)">
+            <summary>
+            Remove
+            </summary>
+            <param name="item">IActiveDirectory</param>
+            <returns></returns>
+        </member>
+        <member name="T:Afonsoft.Http.Parameters">
             <summary>
             Url Query Paramenter
             </summary>
         </member>
-        <member name="M:Afonsoft.Http.HttpParameter.#ctor">
+        <member name="M:Afonsoft.Http.Parameters.#ctor">
             <summary>
             Parameter
             </summary>
         </member>
-        <member name="M:Afonsoft.Http.HttpParameter.#ctor(System.String,System.String)">
+        <member name="M:Afonsoft.Http.Parameters.With(System.String,System.String)">
             <summary>
-            Parameter
+            Initializes a new Param map with an initial key/value pair.
+            
+            <pre>
+              ("/foo/bar", PHttpParameterarams.with("first_name", "John"));
+            </pre>
             </summary>
-            <param name="name">Name</param>
-            <param name="value">Value</param>
+            <param name="key"> the key for the parameter to send to the API </param>
+            <param name="value"> the value for the given key </param>
+            <returns> the Param object, allowing for convenient chaining </returns>
         </member>
-        <member name="P:Afonsoft.Http.HttpParameter.Name">
+        <member name="M:Afonsoft.Http.Parameters.And(System.String,System.String)">
             <summary>
-            Name
+            Adds another key/value pair to the Params map. Automatically
+            converts all values to strings.
+            
+            <pre>
+              ("/foo/bar", HttpParameter.with("first_name", "John").and("last_name", "Smith"));
+            </pre>
             </summary>
+            <param name="key"> the key for the parameter to send to the API </param>
+            <param name="value"> the value for the given key </param>
+            <returns> the Param object, allowing for convenient chaining </returns>
         </member>
-        <member name="P:Afonsoft.Http.HttpParameter.Value">
+        <member name="M:Afonsoft.Http.Parameters.ToString">
             <summary>
-            Value
+            Converts params into a HTTP query string.
             </summary>
         </member>
         <member name="T:Afonsoft.Http.HttpMethod">
@@ -102,6 +177,27 @@
                            }
                        }
             </c>
+        </member>
+        <member name="M:Afonsoft.Http.Rest.#ctor(System.Action{Afonsoft.Http.RestOptions})">
+            <summary>
+            Classe Http para trabalhar com REST
+            </summary>
+            <c>
+            Avianca.Library.Http.Rest request = new Avianca.Library.Http.Rest("https://api.afonsoft.com.br");
+                       request.AddParameter("username", "anogueira");
+                       request.AddParameter("password", "*****");
+                       var tokenRequest = request.HttpPost("/API/Users/Login");
+                       if (tokenRequest != null)
+                       {
+                           string token = tokenRequest.Token;
+                           request.AddHeader("Token", tokenRequest.Authorization.Token.Value);
+                           var userInfo = request.HttpGet("/API/Users/Info");
+                           if (userInfo != null)
+                           {
+                           }
+                       }
+            </c>
+            <param name="options"></param>
         </member>
         <member name="M:Afonsoft.Http.Rest.#ctor(System.String)">
             <summary>
@@ -167,28 +263,6 @@
             <param name="account">Account for Basic Authorization</param>
             <param name="password">Password for Basic Authorization</param>
         </member>
-        <member name="M:Afonsoft.Http.Rest.#ctor(System.String,System.String)">
-            <summary>
-            Classe Http para trabalhar com REST
-            </summary>
-            <param name="account">Account for Basic Authorization</param>
-            <param name="password">Password for Basic Authorization</param>
-            <c>
-            Avianca.Library.Http.Rest request = new Avianca.Library.Http.Rest("https://api.afonsoft.com.br");
-                       request.AddParameter("username", "anogueira");
-                       request.AddParameter("password", "*****");
-                       var tokenRequest = request.HttpPost("/API/Users/Login");
-                       if (tokenRequest != null)
-                       {
-                           string token = tokenRequest.Token;
-                           request.AddHeader("Token", tokenRequest.Authorization.Token.Value);
-                           var userInfo = request.HttpGet("/API/Users/Info");
-                           if (userInfo != null)
-                           {
-                           }
-                       }
-            </c>
-        </member>
         <member name="P:Afonsoft.Http.Rest.Encode">
             <summary>
             Encode Default UTF8
@@ -237,22 +311,16 @@
             recover Header
             </summary>
         </member>
-        <member name="M:Afonsoft.Http.Rest.AddParameter(System.String,System.String)">
-            <summary>
-            Add paramenter for a request, after request this list is clean
-            </summary>
-        </member>
-        <member name="M:Afonsoft.Http.Rest.HttpGetOrPostAsync(System.String,Afonsoft.Http.HttpMethod,System.Collections.Generic.List{Afonsoft.Http.HttpHeader},System.String)">
+        <member name="M:Afonsoft.Http.Rest.HttpGetOrPostAsync(System.String,Afonsoft.Http.HttpMethod,Afonsoft.Http.Parameters,System.Byte[])">
             <summary>
             HttpGetOrPostAsync
             </summary>
             <param name="uri">/API/VALUE</param>
             <param name="method">GET, HEAD, POST, PUT, DELETE, TRACE, or OPTIONS.</param>
-            <param name="headers">headers</param>
             <param name="postData">Data to send</param>
             <returns>String Json</returns>
         </member>
-        <member name="M:Afonsoft.Http.Rest.HttpGetOrPost(System.String,Afonsoft.Http.HttpMethod,System.Collections.Generic.List{Afonsoft.Http.HttpHeader},System.String)">
+        <member name="M:Afonsoft.Http.Rest.HttpGetOrPost(System.String,Afonsoft.Http.HttpMethod,Afonsoft.Http.Parameters,System.Byte[])">
             <summary>
             HttpGetOrPost
             </summary>
@@ -267,7 +335,22 @@
             HttpPost
             </summary>
         </member>
+        <member name="M:Afonsoft.Http.Rest.HttpPost(System.String,Afonsoft.Http.Parameters)">
+            <summary>
+            HttpPost
+            </summary>
+        </member>
         <member name="M:Afonsoft.Http.Rest.HttpPost``1(System.String)">
+            <summary>
+            HttpPost
+            </summary>
+        </member>
+        <member name="M:Afonsoft.Http.Rest.HttpPost``1(System.String,Afonsoft.Http.Parameters)">
+            <summary>
+            HttpPost
+            </summary>
+        </member>
+        <member name="M:Afonsoft.Http.Rest.HttpPost(System.String,System.Byte[])">
             <summary>
             HttpPost
             </summary>
@@ -277,27 +360,12 @@
             HttpPost
             </summary>
         </member>
+        <member name="M:Afonsoft.Http.Rest.HttpPost``1(System.String,System.Byte[])">
+            <summary>
+            HttpPost
+            </summary>
+        </member>
         <member name="M:Afonsoft.Http.Rest.HttpPost``1(System.String,System.String)">
-            <summary>
-            HttpPost
-            </summary>
-        </member>
-        <member name="M:Afonsoft.Http.Rest.HttpPost(System.String,System.Collections.Generic.List{Afonsoft.Http.HttpHeader},System.String)">
-            <summary>
-            HttpPost
-            </summary>
-        </member>
-        <member name="M:Afonsoft.Http.Rest.HttpPost``1(System.String,System.Collections.Generic.List{Afonsoft.Http.HttpHeader},System.String)">
-            <summary>
-            HttpPost
-            </summary>
-        </member>
-        <member name="M:Afonsoft.Http.Rest.HttpPost(System.String,System.Collections.Generic.List{Afonsoft.Http.HttpHeader})">
-            <summary>
-            HttpPost
-            </summary>
-        </member>
-        <member name="M:Afonsoft.Http.Rest.HttpPost``1(System.String,System.Collections.Generic.List{Afonsoft.Http.HttpHeader})">
             <summary>
             HttpPost
             </summary>
@@ -307,7 +375,27 @@
             HttpPostAsync
             </summary>
         </member>
+        <member name="M:Afonsoft.Http.Rest.HttpPostAsync(System.String,Afonsoft.Http.Parameters)">
+            <summary>
+            HttpPostAsync
+            </summary>
+        </member>
         <member name="M:Afonsoft.Http.Rest.HttpPostAsync``1(System.String)">
+            <summary>
+            HttpPostAsync
+            </summary>
+        </member>
+        <member name="M:Afonsoft.Http.Rest.HttpPostAsync``1(System.String,Afonsoft.Http.Parameters)">
+            <summary>
+            HttpPostAsync
+            </summary>
+        </member>
+        <member name="M:Afonsoft.Http.Rest.HttpPostAsync(System.String,System.Byte[])">
+            <summary>
+            HttpPostAsync
+            </summary>
+        </member>
+        <member name="M:Afonsoft.Http.Rest.HttpPostAsync``1(System.String,System.Byte[])">
             <summary>
             HttpPostAsync
             </summary>
@@ -322,32 +410,23 @@
             HttpPostAsync
             </summary>
         </member>
-        <member name="M:Afonsoft.Http.Rest.HttpPostAsync(System.String,System.Collections.Generic.List{Afonsoft.Http.HttpHeader},System.String)">
-            <summary>
-            HttpPostAsync
-            </summary>
-        </member>
-        <member name="M:Afonsoft.Http.Rest.HttpPostAsync``1(System.String,System.Collections.Generic.List{Afonsoft.Http.HttpHeader},System.String)">
-            <summary>
-            HttpPostAsync
-            </summary>
-        </member>
-        <member name="M:Afonsoft.Http.Rest.HttpPostAsync(System.String,System.Collections.Generic.List{Afonsoft.Http.HttpHeader})">
-            <summary>
-            HttpPostAsync
-            </summary>
-        </member>
-        <member name="M:Afonsoft.Http.Rest.HttpPostAsync``1(System.String,System.Collections.Generic.List{Afonsoft.Http.HttpHeader})">
-            <summary>
-            HttpPostAsync
-            </summary>
-        </member>
         <member name="M:Afonsoft.Http.Rest.HttpGet(System.String)">
             <summary>
             HttpGet
             </summary>
         </member>
+        <member name="M:Afonsoft.Http.Rest.HttpGet(System.String,Afonsoft.Http.Parameters)">
+            <summary>
+            HttpGet
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Afonsoft.Http.Rest.HttpGetAsync(System.String)">
+            <summary>
+            HttpGetAsync
+            </summary>
+        </member>
+        <member name="M:Afonsoft.Http.Rest.HttpGetAsync(System.String,Afonsoft.Http.Parameters)">
             <summary>
             HttpGetAsync
             </summary>
@@ -357,29 +436,47 @@
             HttpGetAsync
             </summary>
         </member>
+        <member name="M:Afonsoft.Http.Rest.HttpGetAsync``1(System.String,Afonsoft.Http.Parameters)">
+            <summary>
+            HttpGetAsync
+            </summary>
+        </member>
         <member name="M:Afonsoft.Http.Rest.HttpGet``1(System.String)">
             <summary>
             HttpGet
             </summary>
         </member>
-        <member name="M:Afonsoft.Http.Rest.HttpGet``1(System.String,System.Collections.Generic.List{Afonsoft.Http.HttpHeader})">
+        <member name="M:Afonsoft.Http.Rest.HttpGet``1(System.String,Afonsoft.Http.Parameters)">
             <summary>
             HttpGet
             </summary>
         </member>
-        <member name="M:Afonsoft.Http.Rest.HttpGetAsync``1(System.String,System.Collections.Generic.List{Afonsoft.Http.HttpHeader})">
+        <member name="P:Afonsoft.Http.RestOptions.EndPoint">
             <summary>
-            HttpGetAsync
+            EndPoint => https://api.afonsoft.com.br
             </summary>
         </member>
-        <member name="M:Afonsoft.Http.Rest.HttpGetAsync(System.String,System.Collections.Generic.List{Afonsoft.Http.HttpHeader})">
+        <member name="P:Afonsoft.Http.RestOptions.Timeout">
             <summary>
-            HttpGetAsync
+            Timeout
+            <c>
+            Default: 240000
+            </c>
             </summary>
         </member>
-        <member name="M:Afonsoft.Http.Rest.HttpGet(System.String,System.Collections.Generic.List{Afonsoft.Http.HttpHeader})">
+        <member name="P:Afonsoft.Http.RestOptions.Account">
             <summary>
-            HttpGet
+            Account for Basic Authorization
+            </summary>
+        </member>
+        <member name="P:Afonsoft.Http.RestOptions.Password">
+            <summary>
+            Password for Basic Authorization
+            </summary>
+        </member>
+        <member name="P:Afonsoft.Http.RestOptions.HttpHeaders">
+            <summary>
+            Add Headers for all future Request
             </summary>
         </member>
     </members>

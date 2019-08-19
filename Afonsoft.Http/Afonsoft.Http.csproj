@@ -21,7 +21,11 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|AnyCPU'">
-    <DocumentationFile>C:\Users\anogueira\Source\Repos\Afonsoft.Http\Afonsoft.Http\Afonsoft.Http.xml</DocumentationFile>
+    <DocumentationFile>C:\Users\mazza\source\repos\afonsoft\Afonsoft.Http\Afonsoft.Http\Afonsoft.Http.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
+    <DocumentationFile>C:\Users\mazza\source\repos\afonsoft\Afonsoft.Http\Afonsoft.Http\Afonsoft.Http.xml</DocumentationFile>
   </PropertyGroup>
   
   <ItemGroup Condition=" '$(TargetFramework)' != 'netstandard2.0' ">
