@@ -52,6 +52,44 @@ namespace Afonsoft.Http
     /// </c>
     public class Rest
     {
+        private static RestOptions Build(Action<RestOptions> action)
+        {
+            RestOptions opt = new RestOptions();
+            action.Invoke(opt);
+            return opt;
+        }
+
+        /// <summary>
+        /// Classe Http para trabalhar com REST
+        /// </summary>
+        /// <c>
+        /// Avianca.Library.Http.Rest request = new Avianca.Library.Http.Rest("https://api.afonsoft.com.br");
+        ///            request.AddParameter("username", "anogueira");
+        ///            request.AddParameter("password", "*****");
+        ///            var tokenRequest = request.HttpPost("/API/Users/Login");
+        ///            if (tokenRequest != null)
+        ///            {
+        ///                string token = tokenRequest.Token;
+        ///                request.AddHeader("Token", tokenRequest.Authorization.Token.Value);
+        ///                var userInfo = request.HttpGet("/API/Users/Info");
+        ///                if (userInfo != null)
+        ///                {
+        ///                }
+        ///            }
+        /// </c>
+        /// <param name="options"></param>
+        public Rest(Action<RestOptions> options)
+        {
+            RestOptions opt = Build(options);
+
+            EndPoint = opt.EndPoint;
+            Account = opt.Account;
+            Password = opt.Password;
+            Timeout = opt.Timeout;
+            _headers = opt.HttpHeaders;
+        }
+
+
         /// <summary>
         /// Classe Http para trabalhar com REST
         /// </summary>
