@@ -128,6 +128,12 @@
             <param name="value"> the value for the given key </param>
             <returns> the Param object, allowing for convenient chaining </returns>
         </member>
+        <member name="M:Afonsoft.Http.Parameters.ToQueryString">
+            <summary>
+            Converts params into a HTTP query string.
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Afonsoft.Http.Parameters.ToString">
             <summary>
             Converts params into a HTTP query string.
