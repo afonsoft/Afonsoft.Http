@@ -45,10 +45,17 @@ namespace Afonsoft.Http
         /// <returns> the Param object, allowing for convenient chaining </returns>
         public virtual Parameters And(string key, string value)
         {
-            this[key] = value.ToString();
+            if (!string.IsNullOrEmpty(value))
+                value = "";
+            if (!string.IsNullOrEmpty(key) && !string.IsNullOrEmpty(value))
+                this[key] = value.ToString().Trim();
             return this;
         }
 
+        /// <summary>
+        /// Converts params into a HTTP query string.
+        /// </summary>
+        /// <returns></returns>
         protected internal virtual string ToQueryString()
         {
             StringBuilder query = new StringBuilder();

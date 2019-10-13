@@ -7,15 +7,15 @@
     <Copyright>Afonsoft</Copyright>
     <PackageLicenseUrl></PackageLicenseUrl>
     <NeutralLanguage>pt-BR</NeutralLanguage>
-    <AssemblyVersion>2019.8.19</AssemblyVersion>
-    <FileVersion>2019.8.19</FileVersion>
+    <AssemblyVersion>2019.10.13</AssemblyVersion>
+    <FileVersion>2019.10.13</FileVersion>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/afonsoft/Afonsoft.Http</RepositoryUrl>
     <PackageProjectUrl>https://www.afonsoft.com.br</PackageProjectUrl>
     <PackageTags>http rest api post get put delete afonsoft</PackageTags>
     <Description>Ferramenta para utlizar o REST, http rest api post get put delete afonsoft</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>2019.8.19</Version>
+    <Version>2019.10.13</Version>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageReleaseNotes>Ferramenta para utlizar o REST, http rest api post get put delete afonsoft</PackageReleaseNotes>
   </PropertyGroup>
