@@ -45,9 +45,9 @@ namespace Afonsoft.Http
         /// <returns> the Param object, allowing for convenient chaining </returns>
         public virtual Parameters And(string key, string value)
         {
-            if (!string.IsNullOrEmpty(value))
+            if (string.IsNullOrEmpty(value))
                 value = "";
-            if (!string.IsNullOrEmpty(key) && !string.IsNullOrEmpty(value))
+            if (!string.IsNullOrEmpty(key))
                 this[key] = value.ToString().Trim();
             return this;
         }
